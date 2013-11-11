@@ -7,6 +7,15 @@ import me.flungo.bukkit.plotme.abstractgenerator.AbstractGenManager;
 import me.flungo.bukkit.plotme.abstractgenerator.AbstractGenerator;
 import me.flungo.bukkit.plotme.abstractgenerator.BlockRepresentation;
 import me.flungo.bukkit.plotme.abstractgenerator.WorldGenConfig;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.AUCTION_WALL_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.BASE_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.FILL_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.FOR_SALE_WALL_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.GROUND_LEVEL;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.PLOT_FLOOR_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.PLOT_SIZE;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.PROTECTED_WALL_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.WALL_BLOCK;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -32,11 +41,10 @@ public class GridGenManager extends AbstractGenManager {
             int valx = loc.getBlockX();
             int valz = loc.getBlockZ();
 
-            int size = wgc.getInt("PlotSize") + wgc.getInt("PathWidth");
-            int pathsize = wgc.getInt("PathWidth");
+            int size = wgc.getInt(PLOT_SIZE);
             boolean road = false;
 
-            double n3;
+            double n3 = 1;
             int mod2 = 0;
             int mod1 = 1;
 
@@ -45,13 +53,6 @@ public class GridGenManager extends AbstractGenManager {
 
             //int x2 = (int) Math.ceil((double)valx / size);
             //int z2 = (int) Math.ceil((double)valz / size);
-            if (pathsize % 2 == 1) {
-                n3 = Math.ceil(((double) pathsize) / 2); //3 7
-                mod2 = -1;
-            } else {
-                n3 = Math.floor(((double) pathsize) / 2); //3 7
-            }
-
             for (double i = n3; i >= 0; i--) {
                 if ((valx - i + mod1) % size == 0
                         || (valx + i + mod2) % size == 0) {
@@ -120,10 +121,10 @@ public class GridGenManager extends AbstractGenManager {
         boolean isWallX;
 
         WorldGenConfig wgc = getWGC(w);
-        int plotSize = wgc.getInt("PlotSize");
-        int h = wgc.getInt("RoadHeight");
-        BlockRepresentation wall = wgc.getBlockRepresentation("WallBlock");
-        BlockRepresentation fill = wgc.getBlockRepresentation("FillBlock");
+        int plotSize = wgc.getInt(PLOT_SIZE);
+        int h = wgc.getInt(GROUND_LEVEL);
+        BlockRepresentation wall = wgc.getBlockRepresentation(WALL_BLOCK);
+        BlockRepresentation fill = wgc.getBlockRepresentation(FILL_BLOCK);
 
         if (bottomPlot1.getBlockX() == bottomPlot2.getBlockX()) {
             minX = bottomPlot1.getBlockX();
@@ -183,8 +184,8 @@ public class GridGenManager extends AbstractGenManager {
         int maxZ;
 
         WorldGenConfig wgc = getWGC(w);
-        int h = wgc.getInt("RoadHeight");
-        BlockRepresentation fill = wgc.getBlockRepresentation("FillBlock");
+        int h = wgc.getInt(GROUND_LEVEL);
+        BlockRepresentation fill = wgc.getBlockRepresentation(FILL_BLOCK);
 
         minX = Math.min(topPlot1.getBlockX(), topPlot2.getBlockX());
         maxX = Math.max(bottomPlot1.getBlockX(), bottomPlot2.getBlockX());
@@ -207,7 +208,7 @@ public class GridGenManager extends AbstractGenManager {
 
     @Override
     public void setOwnerDisplay(World world, String id, String line1, String line2, String line3, String line4) {
-        Location pillar = new Location(world, bottomX(id, world) - 1, getWGC(world).getInt("RoadHeight") + 1, bottomZ(id, world) - 1);
+        Location pillar = new Location(world, bottomX(id, world) - 1, getWGC(world).getInt(GROUND_LEVEL) + 1, bottomZ(id, world) - 1);
 
         Block bsign = pillar.clone().add(0, 0, -1).getBlock();
         bsign.setType(Material.AIR);
@@ -227,7 +228,7 @@ public class GridGenManager extends AbstractGenManager {
     public void setSellerDisplay(World world, String id, String line1, String line2, String line3, String line4) {
         removeSellerDisplay(world, id);
 
-        Location pillar = new Location(world, bottomX(id, world) - 1, getWGC(world).getInt("RoadHeight") + 1, bottomZ(id, world) - 1);
+        Location pillar = new Location(world, bottomX(id, world) - 1, getWGC(world).getInt(GROUND_LEVEL) + 1, bottomZ(id, world) - 1);
 
         Block bsign = pillar.clone().add(-1, 0, 0).getBlock();
         bsign.setType(Material.AIR);
@@ -247,7 +248,7 @@ public class GridGenManager extends AbstractGenManager {
     public void setAuctionDisplay(World world, String id, String line1, String line2, String line3, String line4) {
         removeSellerDisplay(world, id);
 
-        Location pillar = new Location(world, bottomX(id, world) - 1, getWGC(world).getInt("RoadHeight") + 1, bottomZ(id, world) - 1);
+        Location pillar = new Location(world, bottomX(id, world) - 1, getWGC(world).getInt(GROUND_LEVEL) + 1, bottomZ(id, world) - 1);
 
         Block bsign = pillar.clone().add(-1, 0, 1).getBlock();
         bsign.setType(Material.AIR);
@@ -267,7 +268,7 @@ public class GridGenManager extends AbstractGenManager {
     public void removeOwnerDisplay(World world, String id) {
         Location bottom = getPlotBottomLoc(world, id);
 
-        Location pillar = new Location(world, bottom.getX() - 1, getWGC(world).getInt("RoadHeight") + 1, bottom.getZ() - 1);
+        Location pillar = new Location(world, bottom.getX() - 1, getWGC(world).getInt(GROUND_LEVEL) + 1, bottom.getZ() - 1);
 
         Block bsign = pillar.add(0, 0, -1).getBlock();
         bsign.setType(Material.AIR);
@@ -277,7 +278,7 @@ public class GridGenManager extends AbstractGenManager {
     public void removeSellerDisplay(World world, String id) {
         Location bottom = getPlotBottomLoc(world, id);
 
-        Location pillar = new Location(world, bottom.getX() - 1, getWGC(world).getInt("RoadHeight") + 1, bottom.getZ() - 1);
+        Location pillar = new Location(world, bottom.getX() - 1, getWGC(world).getInt(GROUND_LEVEL) + 1, bottom.getZ() - 1);
 
         Block bsign = pillar.clone().add(-1, 0, 0).getBlock();
         bsign.setType(Material.AIR);
@@ -290,7 +291,7 @@ public class GridGenManager extends AbstractGenManager {
     public void removeAuctionDisplay(World world, String id) {
         Location bottom = getPlotBottomLoc(world, id);
 
-        Location pillar = new Location(world, bottom.getX() - 1, getWGC(world).getInt("RoadHeight") + 1, bottom.getZ() - 1);
+        Location pillar = new Location(world, bottom.getX() - 1, getWGC(world).getInt(GROUND_LEVEL) + 1, bottom.getZ() - 1);
 
         //Block bsign = pillar.clone().add(-1, 0, 0).getBlock();
         //bsign.setType(Material.AIR);
@@ -304,11 +305,10 @@ public class GridGenManager extends AbstractGenManager {
         int pz = getIdZ(id);
 
         WorldGenConfig wgc = getWGC(world);
-        int plotSize = wgc.getInt("PlotSize");
-        int pathWidth = wgc.getInt("PathWidth");
+        int plotSize = wgc.getInt(PLOT_SIZE);
 
-        int x = px * (plotSize + pathWidth) - (plotSize) - ((int) Math.floor(pathWidth / 2));
-        int z = pz * (plotSize + pathWidth) - (plotSize) - ((int) Math.floor(pathWidth / 2));
+        int x = px * (plotSize + 2) - (plotSize) - (1);
+        int z = pz * (plotSize + 2) - (plotSize) - (1);
 
         return new Location(world, x, 1, z);
     }
@@ -319,11 +319,10 @@ public class GridGenManager extends AbstractGenManager {
         int pz = getIdZ(id);
 
         WorldGenConfig wgc = getWGC(world);
-        int plotSize = wgc.getInt("PlotSize");
-        int pathWidth = wgc.getInt("PathWidth");
+        int plotSize = wgc.getInt(PLOT_SIZE);
 
-        int x = px * (plotSize + pathWidth) - ((int) Math.floor(pathWidth / 2)) - 1;
-        int z = pz * (plotSize + pathWidth) - ((int) Math.floor(pathWidth / 2)) - 1;
+        int x = px * (plotSize + 2) - 2;
+        int z = pz * (plotSize + 2) - 2;
 
         return new Location(world, x, 255, z);
     }
@@ -334,10 +333,10 @@ public class GridGenManager extends AbstractGenManager {
 
         WorldGenConfig wgc = getWGC(w);
 
-        int roadHeight = wgc.getInt("RoadHeight");
-        BlockRepresentation fillBlock = wgc.getBlockRepresentation("FillBlock");
-        BlockRepresentation bottomBlock = wgc.getBlockRepresentation("BottomBlock");
-        BlockRepresentation plotFloorBlock = wgc.getBlockRepresentation("PlotFloorBlock");
+        int roadHeight = wgc.getInt(GROUND_LEVEL);
+        BlockRepresentation fillBlock = wgc.getBlockRepresentation(FILL_BLOCK);
+        BlockRepresentation bottomBlock = wgc.getBlockRepresentation(BASE_BLOCK);
+        BlockRepresentation plotFloorBlock = wgc.getBlockRepresentation(PLOT_FLOOR_BLOCK);
 
         int bottomX = bottom.getBlockX();
         int topX = top.getBlockX();
@@ -406,16 +405,16 @@ public class GridGenManager extends AbstractGenManager {
         }
 
         WorldGenConfig wgc = getWGC(bottom.getWorld());
-        int roadHeight = wgc.getInt("RoadHeight");
-        BlockRepresentation bottomBlock = wgc.getBlockRepresentation("BottomBlock");
-        BlockRepresentation fillBlock = wgc.getBlockRepresentation("FillBlock");
-        BlockRepresentation plotFloorBlock = wgc.getBlockRepresentation("PlotFloorBlock");
+        int roadHeight = wgc.getInt(GROUND_LEVEL);
+        BlockRepresentation bottomBlock = wgc.getBlockRepresentation(BASE_BLOCK);
+        BlockRepresentation fillBlock = wgc.getBlockRepresentation(FILL_BLOCK);
+        BlockRepresentation plotFloorBlock = wgc.getBlockRepresentation(PLOT_FLOOR_BLOCK);
 
         int bottomX = 0;
         int topX = top.getBlockX();
         int bottomZ = 0;
         int topZ = top.getBlockZ();
-        int maxY = 0;
+        int maxY;
 
         long nbBlockCleared = 0;
         long nbBlockClearedBefore = 0;
@@ -500,14 +499,14 @@ public class GridGenManager extends AbstractGenManager {
         //Plot plot = getPlotById(l);
         //World w = l.getWorld();
         WorldGenConfig wgc = getWGC(w);
-        int roadHeight = wgc.getInt("RoadHeight");
+        int roadHeight = wgc.getInt(GROUND_LEVEL);
 
         List<BlockRepresentation> wallBlocks = new ArrayList<BlockRepresentation>();
 
-        BlockRepresentation wallBlock = wgc.getBlockRepresentation("WallBlock");
-        BlockRepresentation protectedWallBlock = wgc.getBlockRepresentation("ProtectedWallBlock");
-        BlockRepresentation auctionWallBlock = wgc.getBlockRepresentation("AuctionWallBlock");
-        BlockRepresentation forSaleWallBlock = wgc.getBlockRepresentation("ForSaleWallBlock");
+        BlockRepresentation wallBlock = wgc.getBlockRepresentation(WALL_BLOCK);
+        BlockRepresentation protectedWallBlock = wgc.getBlockRepresentation(PROTECTED_WALL_BLOCK);
+        BlockRepresentation auctionWallBlock = wgc.getBlockRepresentation(AUCTION_WALL_BLOCK);
+        BlockRepresentation forSaleWallBlock = wgc.getBlockRepresentation(FOR_SALE_WALL_BLOCK);
 
         if (Protected) {
             wallBlocks.add(protectedWallBlock);
@@ -653,7 +652,7 @@ public class GridGenManager extends AbstractGenManager {
         WorldGenConfig wgc = getWGC(w);
 
         if (wgc != null) {
-            return new Location(w, bottomX(id, w) + (topX(id, w) - bottomX(id, w)) / 2, wgc.getInt("RoadHeight") + 2, bottomZ(id, w) - 2);
+            return new Location(w, bottomX(id, w) + (topX(id, w) - bottomX(id, w)) / 2, wgc.getInt(GROUND_LEVEL) + 2, bottomZ(id, w) - 2);
         } else {
             return w.getSpawnLocation();
         }

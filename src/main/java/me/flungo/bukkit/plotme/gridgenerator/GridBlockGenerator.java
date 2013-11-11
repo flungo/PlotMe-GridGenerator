@@ -2,6 +2,12 @@ package me.flungo.bukkit.plotme.gridgenerator;
 
 import java.util.Random;
 import me.flungo.bukkit.plotme.abstractgenerator.WorldGenConfig;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.BASE_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.FILL_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.GROUND_LEVEL;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.PLOT_FLOOR_BLOCK;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.PLOT_SIZE;
+import static me.flungo.bukkit.plotme.gridgenerator.GridWorldConfigPath.WALL_BLOCK;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -17,15 +23,12 @@ public class GridBlockGenerator extends BlockPopulator {
 
     @Override
     public void populate(World w, Random rand, Chunk chunk) {
-        final int plotsize = wgc.getInt("PlotSize");
-        final int pathsize = wgc.getInt("PathSize");
-        final int roadheight = wgc.getInt("RoadHeight");
-        final byte bottom = wgc.getBlockRepresentation("BottomBlock").getData();
-        final byte wall = wgc.getBlockRepresentation("BottomBlock").getData();
-        final byte plotfloor = wgc.getBlockRepresentation("BottomBlock").getData();
-        final byte filling = wgc.getBlockRepresentation("BottomBlock").getData();
-        final byte floor1 = wgc.getBlockRepresentation("BottomBlock").getData();
-        final byte floor2 = wgc.getBlockRepresentation("BottomBlock").getData();
+        final int plotsize = wgc.getInt(PLOT_SIZE);
+        final int roadheight = wgc.getInt(GROUND_LEVEL);
+        final byte bottom = wgc.getBlockRepresentation(BASE_BLOCK).getData();
+        final byte wall = wgc.getBlockRepresentation(WALL_BLOCK).getData();
+        final byte plotfloor = wgc.getBlockRepresentation(PLOT_FLOOR_BLOCK).getData();
+        final byte filling = wgc.getBlockRepresentation(FILL_BLOCK).getData();
 
         int cx = chunk.getX();
         int cz = chunk.getZ();
@@ -33,29 +36,15 @@ public class GridBlockGenerator extends BlockPopulator {
         int xx = cx << 4;
         int zz = cz << 4;
 
-        double size = plotsize + pathsize;
+        double size = plotsize;
         int valx;
         int valz;
 
-        double n1;
-        double n2;
-        double n3;
+        double n1 = -1;
+        double n2 = 0;
+        double n3 = 1;
         int mod2 = 0;
         int mod1 = 1;
-
-        if (pathsize % 2 == 1) {
-            n1 = Math.ceil(((double) pathsize) / 2) - 2;
-            n2 = Math.ceil(((double) pathsize) / 2) - 1;
-            n3 = Math.ceil(((double) pathsize) / 2);
-        } else {
-            n1 = Math.floor(((double) pathsize) / 2) - 2;
-            n2 = Math.floor(((double) pathsize) / 2) - 1;
-            n3 = Math.floor(((double) pathsize) / 2);
-        }
-
-        if (pathsize % 2 == 1) {
-            mod2 = -1;
-        }
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -84,7 +73,7 @@ public class GridBlockGenerator extends BlockPopulator {
 
                             if (found) {
                                 //result[(x * 16 + z) * 128 + y] = floor1; //floor1
-                                setBlock(w, x + xx, y, z + zz, floor1);
+                                setBlock(w, x + xx, y, z + zz, plotfloor);
                             } else {
                                 //result[(x * 16 + z) * 128 + y] = filling; //filling
                                 setBlock(w, x + xx, y, z + zz, filling);
@@ -94,20 +83,20 @@ public class GridBlockGenerator extends BlockPopulator {
                             if ((valz - n3 + mod1) % size == 0 || (valz + n3 + mod2) % size == 0
                                     || (valz - n2 + mod1) % size == 0 || (valz + n2 + mod2) % size == 0) {
                                 //result[(x * 16 + z) * 128 + y] = floor1; //floor1
-                                setBlock(w, x + xx, y, z + zz, floor1);
+                                setBlock(w, x + xx, y, z + zz, plotfloor);
                             } else {
                                 //result[(x * 16 + z) * 128 + y] = floor2; //floor2
-                                setBlock(w, x + xx, y, z + zz, floor2);
+                                setBlock(w, x + xx, y, z + zz, plotfloor);
                             }
                         } else if ((valx - n1 + mod1) % size == 0 || (valx + n1 + mod2) % size == 0) //middle+2
                         {
                             if ((valz - n2 + mod1) % size == 0 || (valz + n2 + mod2) % size == 0
                                     || (valz - n1 + mod1) % size == 0 || (valz + n1 + mod2) % size == 0) {
                                 //result[(x * 16 + z) * 128 + y] = floor2; //floor2
-                                setBlock(w, x + xx, y, z + zz, floor2);
+                                setBlock(w, x + xx, y, z + zz, plotfloor);
                             } else {
                                 //result[(x * 16 + z) * 128 + y] = floor1; //floor1
-                                setBlock(w, x + xx, y, z + zz, floor1);
+                                setBlock(w, x + xx, y, z + zz, plotfloor);
                             }
                         } else {
                             boolean found = false;
@@ -120,11 +109,11 @@ public class GridBlockGenerator extends BlockPopulator {
 
                             if (found) {
                                 //result[(x * 16 + z) * 128 + y] = floor1; //floor1
-                                setBlock(w, x + xx, y, z + zz, floor1);
+                                setBlock(w, x + xx, y, z + zz, plotfloor);
                             } else {
                                 if ((valz - n2 + mod1) % size == 0 || (valz + n2 + mod2) % size == 0) {
                                     //result[(x * 16 + z) * 128 + y] = floor2; //floor2
-                                    setBlock(w, x + xx, y, z + zz, floor2);
+                                    setBlock(w, x + xx, y, z + zz, plotfloor);
                                 } else {
                                     boolean found2 = false;
                                     for (double i = n1; i >= 0; i--) {
@@ -136,7 +125,7 @@ public class GridBlockGenerator extends BlockPopulator {
 
                                     if (found2) {
                                         //result[(x * 16 + z) * 128 + y] = floor1; //floor1
-                                        setBlock(w, x + xx, y, z + zz, floor1);
+                                        setBlock(w, x + xx, y, z + zz, plotfloor);
                                     } else {
                                         boolean found3 = false;
                                         for (double i = n3; i >= 0; i--) {
@@ -148,7 +137,7 @@ public class GridBlockGenerator extends BlockPopulator {
 
                                         if (found3) {
                                             //result[(x * 16 + z) * 128 + y] = floor1; //floor1
-                                            setBlock(w, x + xx, y, z + zz, floor1);
+                                            setBlock(w, x + xx, y, z + zz, plotfloor);
                                         } else {
                                             //result[(x * 16 + z) * 128 + y] = plotfloor; //plotfloor
                                             setBlock(w, x + xx, y, z + zz, plotfloor);
