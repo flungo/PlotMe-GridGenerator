@@ -9,12 +9,13 @@
 package me.flungo.bukkit.plotme.gridgenerator;
 
 import me.flungo.bukkit.plotme.abstractgenerator.AbstractWorldConfigPath;
+import me.flungo.bukkit.plotme.abstractgenerator.WorldConfigPath;
 
 /**
  *
  * @author Fabrizio Lungo <fab@lungo.co.uk>
  */
-public enum WorldConfigPath {
+public enum GridWorldConfigPath implements WorldConfigPath {
 
     PLOT_SIZE(AbstractWorldConfigPath.PLOT_SIZE),
     X_TRANSLATION(AbstractWorldConfigPath.X_TRANSLATION),
@@ -25,12 +26,12 @@ public enum WorldConfigPath {
     public final String path;
     public final Object def;
 
-    private WorldConfigPath(String path, Object def) {
+    private GridWorldConfigPath(String path, Object def) {
         this.path = path;
         this.def = def;
     }
 
-    private WorldConfigPath(AbstractWorldConfigPath awcp) {
+    private GridWorldConfigPath(AbstractWorldConfigPath awcp) {
         this.path = awcp.path;
         this.def = awcp.def;
     }
@@ -38,5 +39,15 @@ public enum WorldConfigPath {
     @Override
     public String toString() {
         return path;
+    }
+
+    @Override
+    public String path() {
+        return path;
+    }
+
+    @Override
+    public Object def() {
+        return def;
     }
 }
