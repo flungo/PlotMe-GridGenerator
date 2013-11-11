@@ -1,0 +1,9 @@
+name: PlotMe-GridGenerator
+main: me.flungo.bukkit.plotme.gridgenerator.GridGenerator
+version: '1.0.0'
+author: flungo
+load: startup
+website: http://ci.flungo.me/job/PlotMe-GridGenerator/
+loadbefore: [Multiverse-Core, MultiWorld, PlotMe-Core]
+description: >
+             Handles plot creation
